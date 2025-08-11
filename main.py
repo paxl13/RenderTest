@@ -10,6 +10,17 @@ def hello():
 def health():
     return {'status': 'healthy', 'message': 'App is running'}
 
+@app.route('/api/data')
+def get_data():
+    return {
+        'users': [
+            {'id': 1, 'name': 'Alice', 'email': 'alice@example.com'},
+            {'id': 2, 'name': 'Bob', 'email': 'bob@example.com'}
+        ],
+        'total': 2,
+        'timestamp': '2025-01-01T12:00:00Z'
+    }
+
 if __name__ == '__main__':
     import os
     port = int(os.environ.get('PORT', 5000))
