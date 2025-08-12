@@ -7,6 +7,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TableSortLabel,
   IconButton,
   Dialog,
   DialogTitle,
@@ -41,6 +42,8 @@ export default function TableView({ onRefresh }) {
     notes: ''
   });
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+  const [orderBy, setOrderBy] = useState('name');
+  const [order, setOrder] = useState('asc');
 
   const fetchContacts = async () => {
     setLoading(true);
@@ -139,6 +142,45 @@ export default function TableView({ onRefresh }) {
     return new Date(dateString).toLocaleString();
   };
 
+  const handleRequestSort = (property) => {
+    const isAsc = orderBy === property && order === 'asc';
+    setOrder(isAsc ? 'desc' : 'asc');
+    setOrderBy(property);
+  };
+
+  const sortedContacts = React.useMemo(() => {
+    const comparator = (a, b) => {
+      let aValue = a[orderBy];
+      let bValue = b[orderBy];
+      
+      // Handle null/undefined values
+      if (!aValue) aValue = '';
+      if (!bValue) bValue = '';
+      
+      // Handle dates
+      if (orderBy === 'created_at') {
+        aValue = new Date(aValue).getTime();
+        bValue = new Date(bValue).getTime();
+      }
+      
+      // Handle strings (case-insensitive)
+      if (typeof aValue === 'string') {
+        aValue = aValue.toLowerCase();
+        bValue = bValue.toLowerCase();
+      }
+      
+      if (bValue < aValue) {
+        return order === 'asc' ? 1 : -1;
+      }
+      if (bValue > aValue) {
+        return order === 'asc' ? -1 : 1;
+      }
+      return 0;
+    };
+    
+    return [...contacts].sort(comparator);
+  }, [contacts, order, orderBy]);
+
   return (
     <>
       <Paper elevation={3} sx={{ p: 2, mt: 3 }}>
@@ -158,17 +200,65 @@ export default function TableView({ onRefresh }) {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>Name</TableCell>
-                  <TableCell>Email</TableCell>
-                  <TableCell>Phone</TableCell>
-                  <TableCell>Company</TableCell>
-                  <TableCell>Notes</TableCell>
-                  <TableCell>Created</TableCell>
+                  <TableCell>
+                    <TableSortLabel
+                      active={orderBy === 'name'}
+                      direction={orderBy === 'name' ? order : 'asc'}
+                      onClick={() => handleRequestSort('name')}
+                    >
+                      Name
+                    </TableSortLabel>
+                  </TableCell>
+                  <TableCell>
+                    <TableSortLabel
+                      active={orderBy === 'email'}
+                      direction={orderBy === 'email' ? order : 'asc'}
+                      onClick={() => handleRequestSort('email')}
+                    >
+                      Email
+                    </TableSortLabel>
+                  </TableCell>
+                  <TableCell>
+                    <TableSortLabel
+                      active={orderBy === 'phone'}
+                      direction={orderBy === 'phone' ? order : 'asc'}
+                      onClick={() => handleRequestSort('phone')}
+                    >
+                      Phone
+                    </TableSortLabel>
+                  </TableCell>
+                  <TableCell>
+                    <TableSortLabel
+                      active={orderBy === 'compagny'}
+                      direction={orderBy === 'compagny' ? order : 'asc'}
+                      onClick={() => handleRequestSort('compagny')}
+                    >
+                      Company
+                    </TableSortLabel>
+                  </TableCell>
+                  <TableCell>
+                    <TableSortLabel
+                      active={orderBy === 'notes'}
+                      direction={orderBy === 'notes' ? order : 'asc'}
+                      onClick={() => handleRequestSort('notes')}
+                    >
+                      Notes
+                    </TableSortLabel>
+                  </TableCell>
+                  <TableCell>
+                    <TableSortLabel
+                      active={orderBy === 'created_at'}
+                      direction={orderBy === 'created_at' ? order : 'asc'}
+                      onClick={() => handleRequestSort('created_at')}
+                    >
+                      Created
+                    </TableSortLabel>
+                  </TableCell>
                   <TableCell align="center">Actions</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {contacts.map((contact) => (
+                {sortedContacts.map((contact) => (
                   <TableRow key={contact.id} hover>
                     <TableCell>{contact.name}</TableCell>
                     <TableCell>{contact.email}</TableCell>
