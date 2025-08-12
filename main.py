@@ -68,17 +68,12 @@ def health():
 
 @app.route("/api/data")
 def get_data():
-    try: 
-        result = (supabase.table("mytable").select("*").execute())
-        rv = []
-        for i in result:
-            rv.append(i)
-
-        return rv
+    try:
+        result = supabase.table("mytable").select("*").execute()
+        return result.data
     except Exception as e:
-        print(f"Error saving to database: {e}")
+        return {"error": str(e)}, 500
 
-    return {"a": 123}
 
 if __name__ == "__main__":
     import os
