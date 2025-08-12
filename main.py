@@ -1,11 +1,14 @@
 import os
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from supabase import create_client, Client
 from dotenv import load_dotenv
 
 load_dotenv()
 
-app = Flask(__name__)
+# Configure Flask to serve React build files
+app = Flask(__name__, 
+            static_folder='frontend/build/static',
+            template_folder='frontend/build')
 app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-key")
 
 # Initialize Supabase client
@@ -20,54 +23,53 @@ if not supabase_url or not supabase_key:
 supabase: Client = create_client(supabase_url, supabase_key)
 
 
+# Serve React app for non-API routes
 @app.route("/")
-def index():
+@app.route("/<path:path>")
+def serve_react(path=""):
+    # Don't serve React for API routes
+    if path.startswith('api/'):
+        return {"error": "API route not found"}, 404
     return render_template("index.html")
 
 
-@app.route("/submit", methods=["POST"])
-def submit_form():
+@app.route("/api/contacts", methods=["POST"])
+def create_contact():
     try:
-        name = request.form.get("name")
-        email = request.form.get("email")
-        phone = request.form.get("phone")
-        company = request.form.get("company")
-        category = request.form.get("category")
-        notes = request.form.get("notes")
-
+        data = request.get_json()
+        
         # Insert data into Supabase
         result = (
             supabase.table("mytable")
             .insert(
                 {
-                    "name": name,
-                    "email": email,
-                    "phone": phone,
-                    "compagny": company,  # Note: using 'compagny' to match schema
-                    "category": category,
-                    "notes": notes,
+                    "name": data.get("name"),
+                    "email": data.get("email"),
+                    "phone": data.get("phone"),
+                    "compagny": data.get("company"),  # Note: using 'compagny' to match schema
+                    "category": data.get("category"),
+                    "notes": data.get("notes"),
                 }
             )
             .execute()
         )
 
         if result.data:
-            return render_template("index.html", success=True)
+            return jsonify({"success": True, "data": result.data})
         else:
-            return render_template("index.html", error="Failed to save data")
+            return jsonify({"error": "Failed to save data"}), 400
 
     except Exception as e:
-        print(f"Error saving to database: {e}")
-        return render_template("index.html", error="Database error occurred")
+        return jsonify({"error": str(e)}), 500
 
 
-@app.route("/health")
+@app.route("/api/health")
 def health():
     return {"status": "healthy", "message": "App is running"}
 
 
-@app.route("/api/data")
-def get_data():
+@app.route("/api/contacts")
+def get_contacts():
     try:
         result = supabase.table("mytable").select("*").execute()
         return result.data
