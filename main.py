@@ -76,6 +76,56 @@ def get_contacts():
         return {"error": str(e)}, 500
 
 
+@app.route("/api/contacts/<int:contact_id>", methods=["PUT"])
+def update_contact(contact_id):
+    try:
+        data = request.get_json()
+        
+        # Update data in Supabase
+        result = (
+            supabase.table("mytable")
+            .update(
+                {
+                    "name": data.get("name"),
+                    "email": data.get("email"),
+                    "phone": data.get("phone"),
+                    "compagny": data.get("company"),  # Note: using 'compagny' to match schema
+                    "notes": data.get("notes"),
+                }
+            )
+            .eq("id", contact_id)
+            .execute()
+        )
+
+        if result.data:
+            return jsonify({"success": True, "data": result.data})
+        else:
+            return jsonify({"error": "Contact not found"}), 404
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/contacts/<int:contact_id>", methods=["DELETE"])
+def delete_contact(contact_id):
+    try:
+        # Delete data from Supabase
+        result = (
+            supabase.table("mytable")
+            .delete()
+            .eq("id", contact_id)
+            .execute()
+        )
+
+        if result.data:
+            return jsonify({"success": True, "message": "Contact deleted"})
+        else:
+            return jsonify({"error": "Contact not found"}), 404
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 if __name__ == "__main__":
     import os
 

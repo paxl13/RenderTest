@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 import { Send as SendIcon } from '@mui/icons-material';
 
-export default function ContactForm() {
+export default function ContactForm({ onSuccess }) {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -55,6 +55,9 @@ export default function ContactForm() {
           company: '',
                 notes: '',
         });
+        if (onSuccess) {
+          onSuccess();
+        }
       } else {
         setStatus({ type: 'error', message: data.error || 'Failed to save contact' });
       }
