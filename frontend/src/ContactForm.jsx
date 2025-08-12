@@ -11,20 +11,12 @@ import {
 } from '@mui/material';
 import { Send as SendIcon } from '@mui/icons-material';
 
-const categories = [
-  { value: 'customer', label: 'Customer' },
-  { value: 'supplier', label: 'Supplier' },
-  { value: 'partner', label: 'Partner' },
-  { value: 'other', label: 'Other' },
-];
-
 export default function ContactForm() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
     company: '',
-    category: '',
     notes: '',
   });
   const [status, setStatus] = useState({ type: '', message: '' });
@@ -61,8 +53,7 @@ export default function ContactForm() {
           email: '',
           phone: '',
           company: '',
-          category: '',
-          notes: '',
+                notes: '',
         });
       } else {
         setStatus({ type: 'error', message: data.error || 'Failed to save contact' });
@@ -133,25 +124,6 @@ export default function ContactForm() {
               onChange={handleChange}
               disabled={loading}
             />
-          </Grid>
-          
-          <Grid item xs={12}>
-            <TextField
-              required
-              fullWidth
-              select
-              name="category"
-              label="Category"
-              value={formData.category}
-              onChange={handleChange}
-              disabled={loading}
-            >
-              {categories.map((option) => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.label}
-                </MenuItem>
-              ))}
-            </TextField>
           </Grid>
           
           <Grid item xs={12}>

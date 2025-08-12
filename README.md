@@ -4,7 +4,7 @@ A simple Flask web application for collecting contact information through a web 
 
 ## Features
 
-- Contact information entry form (name, email, phone, company, category, notes)
+- Contact information entry form (name, email, phone, company, notes)
 - Clean, responsive web interface
 - Form validation and success feedback
 - JSON API endpoint for sample user data

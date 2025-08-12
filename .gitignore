@@ -175,5 +175,22 @@ pyrightconfig.json
 
 # End of https://www.toptal.com/developers/gitignore/api/python
 
-.claude
-*/node_modules/*
+# Claude specific
+.claude/
+
+# Node.js / Frontend
+frontend/node_modules/
+frontend/build/
+frontend/dist/
+frontend/.pnpm-debug.log*
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/package-lock.json
+frontend/pnpm-lock.yaml
+
+# VSCode
+.vscode/
+
+# macOS
+.DS_Store

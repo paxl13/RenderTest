@@ -47,7 +47,6 @@ def create_contact():
                     "email": data.get("email"),
                     "phone": data.get("phone"),
                     "compagny": data.get("company"),  # Note: using 'compagny' to match schema
-                    "category": data.get("category"),
                     "notes": data.get("notes"),
                 }
             )
